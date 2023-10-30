@@ -8,10 +8,11 @@ public static class IServiceCollectionExtension
     public static IServiceCollection AddUtilities(this IServiceCollection services)
     {
         
-        // services.AddMvc(options =>
-        // {
-        //     options.Filters.Add<LinkRewritingFilter>();
-        // });
+        services.AddMvc(options =>
+        {
+            options.Filters.Add<LinkRewritingFilter>();
+        });
+        services.AddTransient<IEmailHandler, EmailHandler>();
         return services;
     }
 }
