@@ -9,10 +9,15 @@ public static class IServiceCollectionExtension
 {
     public static IServiceCollection AddUtilities(this IServiceCollection services, ConfigurationManager Configuration)
     {
-        var notificationSettingsSection = Configuration.GetSection("NotificationConfig");
-        services.Configure<NotificationConfig>(notificationSettingsSection);
+        // TODO: Move notification settings to key vault
+        services.AddTransient<IKeyVaultService, KeyVaultService>();
+        services.AddAppSettings<NotificationConfig>(Configuration, "NotificationConfig");
 
-        var config = notificationSettingsSection.Get<NotificationConfig>();
+        services.AddTransient<IServiceBusQueueService, ServiceBusQueueService>();
+        services.AddTransient<INotificationHandler, NotificationHandler>();
+
+        var config = Configuration.GetSection(nameof(NotificationConfig)).Get<NotificationConfig>();
+
 
         services.AddMvc(options =>
         {
