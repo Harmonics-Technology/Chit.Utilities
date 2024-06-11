@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Chit.Utilities;
 
@@ -242,4 +243,28 @@ public class ChitStandardResponse<T> : Link
         return this;
     }
 
+}
+
+[ApiController]
+[Route("api/[controller]")]
+public class ChitControllerBase : ControllerBase
+{
+    protected ObjectResult ChitResult<T>(ChitStandardResponse<T> response)
+    {
+        switch (response.StatusCode)
+        {
+            case HttpStatusCode.OK:
+                return Ok(response);
+            case HttpStatusCode.NotFound:
+                return NotFound(response);
+            case HttpStatusCode.BadRequest:
+                return BadRequest(response);
+            case HttpStatusCode.InternalServerError:
+                return BadRequest(response);
+            case HttpStatusCode.Unauthorized:
+                return Unauthorized(response);
+            default:
+                return Ok(response);
+        }
+    }
 }

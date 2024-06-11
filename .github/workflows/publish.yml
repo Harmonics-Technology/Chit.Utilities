@@ -10,10 +10,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 8.0.0
+      # - name: Setup dotnet
+      #   uses: actions/setup-dotnet@v1
+      #   with:
+      #     dotnet-version: 8.0.0
+      - name: Get version from tag
+        id: get_version
+        run: echo "::set-output name=VERSION::${{ github.ref_name }}"
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
 
       # Publish
       - name: publish on version change
@@ -23,4 +28,4 @@ jobs:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: Chit.Utilities/Chit.Utilities.csproj
           NUGET_KEY: ${{ secrets.NUGET_SECRET_KEY }}
-          VERSION_STATIC: 0.0.3
+          VERSION_STATIC: ${{ steps.get_version.outputs.VERSION }}

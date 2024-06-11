@@ -7,14 +7,12 @@ namespace Chit.Utilities;
 
 public static class IServiceCollectionExtension
 {
-    public static IServiceCollection AddUtilities(this IServiceCollection services, ConfigurationManager Configuration)
+    public static IServiceCollection AddUtilities(this IServiceCollection services, IConfiguration Configuration)
     {
         // TODO: Move notification settings to key vault
         services.AddTransient<IKeyVaultService, KeyVaultService>();
-        services.AddAppSettings<NotificationConfig>(Configuration, "NotificationConfig");
 
         services.AddTransient<IServiceBusQueueService, ServiceBusQueueService>();
-        services.AddTransient<INotificationHandler, NotificationHandler>();
 
         var config = Configuration.GetSection(nameof(NotificationConfig)).Get<NotificationConfig>();
 

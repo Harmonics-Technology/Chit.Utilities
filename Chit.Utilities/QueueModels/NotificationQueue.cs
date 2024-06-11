@@ -7,4 +7,5 @@ public class NotificationQueue
     public string PhoneNumber { get; set; }
     public dynamic Data { get; set; }
     public dynamic[] Attachments { get; set; }
+    public string _typename { get; set; }
 }

@@ -6,12 +6,12 @@ using Newtonsoft.Json;
 
 namespace Chit.Utilities;
 
-public class ExceptionHandler
+public class ChitExceptionHandler
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<ExceptionHandler> _logger;
+    private readonly ILogger<ChitExceptionHandler> _logger;
 
-    public ExceptionHandler(RequestDelegate next, ILogger<ExceptionHandler> logger)
+    public ChitExceptionHandler(RequestDelegate next, ILogger<ChitExceptionHandler> logger)
     {
         _next = next;
         _logger = logger;
@@ -34,10 +34,27 @@ public class ExceptionHandler
     {
         context.Response.ContentType = "application/json";
         int statusCode = (int)HttpStatusCode.InternalServerError;
+        var errorMessages = new List<string>();
+        foreach (var exceptionMessage in exception.Message.Split('\n'))
+        {
+            errorMessages.Add(exceptionMessage);
+        }
+        // add messages from inner exceptions
+        var innerException = exception.InnerException;
+        while (innerException != null)
+        {
+            foreach (var exceptionMessage in innerException.Message.Split('\n'))
+            {
+                errorMessages.Add(exceptionMessage);
+            }
+            innerException = innerException.InnerException;
+        }
+
         var result = JsonConvert.SerializeObject(new ChitStandardResponse<dynamic>()
         {
             StatusCode = (HttpStatusCode)statusCode,
-            Message = exception.Message
+            Message = exception.Message,
+            Errors = errorMessages
         });
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = statusCode;
@@ -47,9 +64,9 @@ public class ExceptionHandler
 
 public static class ExceptionHandlerExtensions
 {
-    public static void UseExceptionHandler(this IApplicationBuilder app)
+    public static void UseChitExceptionHandler(this IApplicationBuilder app)
     {
-        app.UseMiddleware<ExceptionHandler>();
+        app.UseMiddleware<ChitExceptionHandler>();
     }
 }
 
